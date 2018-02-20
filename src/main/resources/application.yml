@@ -1,0 +1,38 @@
+server:
+  # Listening port
+  port: 8080
+  # Hide the server version
+  server-header: Apache
+
+
+spring:
+  http:
+    # Character set encoding
+    encoding:
+      enabled: true
+      force: true
+  # Send distributed traces to zipkin server (using Eureka to find the server)
+  sleuth:
+    sampler:
+      percentage: 1.0
+  zipkin:
+    baseUrl: http://zipkin-service/
+
+
+management:
+  port: 8000
+  add-application-context-header: false
+  security:
+    # Disable security on the management port (NOT FOR PRODUCTION)
+    enabled: false
+
+
+
+eureka:
+  client:
+    serviceUrl:
+      default: http://localhost:8761/eureka/
+  instance:
+    metadataMap:
+      # Support for Spring Boot Admin client discovery
+      management.port: 8000

@@ -1,0 +1,115 @@
+plugins {
+    // Use the Spring Boot Gradle plugin, which automatically applies the dependency management plugin
+    // and configures it to import the spring-boot-starter-parent bom.
+    id 'org.springframework.boot' version '1.5.10.RELEASE'
+
+    // Versioning plugin
+    id 'pl.allegro.tech.build.axion-release' version '1.8.1'
+}
+
+apply plugin: 'java'
+
+group 'atc'
+
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        // Import the Spring Cloud BOM
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Edgware.SR2'
+    }
+}
+
+dependencies {
+    // Enable Spring MVC
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+
+    // Enable Spring Security
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+
+    // Production metrics for Spring Boot
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+
+    // Service registration via Eureka
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-eureka-server'
+
+    // Enable distributed tracing with Sleuth
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-zipkin'
+
+    // Enable JSON logging
+    runtime( group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.11' ) {
+        exclude group: 'ch.qos.logback', module: 'logback-core'
+    }
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+// Configure the spring boot executable jar
+springBoot {
+    executable = true
+    buildInfo()
+}
+
+// Versioning with the Axion release plugin
+scmVersion {
+    ignoreUncommittedChanges = false
+
+    tag {
+        prefix = 'v'
+        versionSeparator = ''
+    }
+
+    versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
+    branchVersionIncrementer = [
+          'master'    : 'incrementMinor',
+          'feature'   : 'incrementMinor',
+          'release/.*': 'incrementPrerelease'
+    ]
+
+    // Decorators
+    versionCreator 'simple'
+    branchVersionCreator = [
+          'feature/.*': 'versionWithBranch'
+    ]
+
+    checks {
+        uncommittedChanges = false // permanently disable uncommitted changes check
+    }
+}
+project.version = scmVersion.version
+
+// Add the version number to the manifest
+jar {
+    manifest {
+        attributes( "Implementation-Title": project.name,
+                    "Implementation-Version": project.version.toString() )
+    }
+}
+
+// Build the docker container for this application
+//task buildDocker( type: Docker, dependsOn: build ) {
+//    push = false
+//    applicationName = rootProject.name
+//    dockerfile = file( 'Dockerfile' )
+//
+//    doFirst {
+//        // Rename the app jar to "app.jar" so that the Dockerfile does not require renames
+//        copy {
+//            from "${project.buildDir}/libs"
+//            into stageDir
+//            include "${rootProject.name}-${version}.jar"
+//            rename( "${rootProject.name}-${version}.jar", "app.jar" )
+//        }
+//    }
+//}
+//
+
+task wrapper( type: Wrapper ) {
+    gradleVersion = '4.5.1'
+}
+
