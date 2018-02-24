@@ -3,8 +3,9 @@
 	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 	​
 	<springProperty scope="context" name="springAppName" source="spring.application.name"/>
-    <!-- Example for logging into the build folder of your project -->
-    <property name="LOG_FILE" value="${BUILD_FOLDER:-build}/${springAppName}"/>​
+
+    <!-- Example for logging into a 'logs' folder -->
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}}/${springAppName}.log"/>​
 
     <!-- You can override this to have a custom pattern -->
     <property name="CONSOLE_LOG_PATTERN"
