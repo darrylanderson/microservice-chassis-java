@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        // The gradle-docker plugin we want to use isn't yet in gradle plugin portal, se we
+        // pull it from jcenter
+        classpath 'se.transmode.gradle:gradle-docker:1.2'
+    }
+}
+
 plugins {
     // Use the Spring Boot Gradle plugin, which automatically applies the dependency management plugin
     // and configures it to import the spring-boot-starter-parent bom.
@@ -7,20 +18,27 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.8.1'
 }
 
+// The Java plugin allows us to compile and package our code into a jar file
 apply plugin: 'java'
 
+// Support for packaging our application as a Docker image
+apply plugin: 'docker'
+
+// Define the namespace for our build artifacts (replace with your own group)
 group 'atc'
 
-
+// Explicitly declare that we're using JDK 1.8
 sourceCompatibility = 1.8
 
+// Use Maven Central to resolve all 3rd party dependencies
 repositories {
     mavenCentral()
 }
 
+// Using the dependency management plugin, import the dependencies for
+// Spring Cloud release train 'Edgware.SR2'
 dependencyManagement {
     imports {
-        // Import the Spring Cloud BOM
         mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Edgware.SR2'
     }
 }
@@ -57,13 +75,18 @@ springBoot {
 
 // Versioning with the Axion release plugin
 scmVersion {
+
+    // Treat uncommitted changes as trigger for version increment
     ignoreUncommittedChanges = false
 
+    // All versions will start with "v"
     tag {
         prefix = 'v'
         versionSeparator = ''
     }
 
+    // Our versioning scheme is major.minor.rcX. If we're on a branch named "release/*", increment the release
+    // candidate number, otherwise increment the minor version number.
     versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
     branchVersionIncrementer = [
           'master'    : 'incrementMinor',
@@ -78,7 +101,8 @@ scmVersion {
     ]
 
     checks {
-        uncommittedChanges = false // permanently disable uncommitted changes check
+        // Allow for releasing a new version if there are uncommitted changes
+        uncommittedChanges = false
     }
 }
 project.version = scmVersion.version
@@ -91,24 +115,26 @@ jar {
     }
 }
 
-// Build the docker container for this application
-//task buildDocker( type: Docker, dependsOn: build ) {
-//    push = false
-//    applicationName = rootProject.name
-//    dockerfile = file( 'Dockerfile' )
-//
-//    doFirst {
-//        // Rename the app jar to "app.jar" so that the Dockerfile does not require renames
-//        copy {
-//            from "${project.buildDir}/libs"
-//            into stageDir
-//            include "${rootProject.name}-${version}.jar"
-//            rename( "${rootProject.name}-${version}.jar", "app.jar" )
-//        }
-//    }
-//}
-//
 
+// Build the docker container for this application
+task buildDocker( type: Docker, dependsOn: build ) {
+    push = false
+    applicationName = rootProject.name
+    dockerfile = file( 'Dockerfile' )
+
+    doFirst {
+        // Rename the app jar to "app.jar" so that the Dockerfile does not require renames
+        copy {
+            from "${project.buildDir}/libs"
+            into stageDir
+            include "${rootProject.name}-${version}.jar"
+            rename( "${rootProject.name}-${version}.jar", "app.jar" )
+        }
+    }
+}
+
+
+// Configure the Gradle wrapper
 task wrapper( type: Wrapper ) {
     gradleVersion = '4.5.1'
 }
