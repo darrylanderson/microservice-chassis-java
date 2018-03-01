@@ -47,14 +47,14 @@ dependencies {
     // Enable Spring MVC
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
 
-    // Enable Spring Security
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
-
     // Production metrics for Spring Boot
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
 
     // Service registration via Eureka
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-eureka-server'
+
+    // Feign declarative REST client
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-feign'
 
     // Enable distributed tracing with Sleuth
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-zipkin'
@@ -67,11 +67,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-// Configure the spring boot executable jar
-springBoot {
-    executable = true
-    buildInfo()
-}
 
 // Versioning with the Axion release plugin
 scmVersion {
@@ -107,12 +102,20 @@ scmVersion {
 }
 project.version = scmVersion.version
 
+
 // Add the version number to the manifest
 jar {
     manifest {
         attributes( "Implementation-Title": project.name,
                     "Implementation-Version": project.version.toString() )
     }
+}
+
+
+// Configure the spring boot executable jar
+springBoot {
+    executable = true
+    buildInfo()
 }
 
 

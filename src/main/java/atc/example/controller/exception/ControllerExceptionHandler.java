@@ -1,4 +1,4 @@
-package atc.example.controller;
+package atc.example.controller.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
