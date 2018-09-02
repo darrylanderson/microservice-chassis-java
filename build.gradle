@@ -12,7 +12,7 @@ buildscript {
 plugins {
     // Use the Spring Boot Gradle plugin, which automatically applies the dependency management plugin
     // and configures it to import the spring-boot-starter-parent bom.
-    id 'org.springframework.boot' version '1.5.10.RELEASE'
+    id 'org.springframework.boot' version '2.0.4.RELEASE'
 
     // Versioning plugin
     id 'pl.allegro.tech.build.axion-release' version '1.8.1'
@@ -21,14 +21,16 @@ plugins {
 // The Java plugin allows us to compile and package our code into a jar file
 apply plugin: 'java'
 
+apply plugin: 'io.spring.dependency-management'
+
 // Support for packaging our application as a Docker image
 apply plugin: 'docker'
 
 // Define the namespace for our build artifacts (replace with your own group)
 group 'atc'
 
-// Explicitly declare that we're using JDK 1.8
-sourceCompatibility = 1.8
+// Explicitly declare that we're using JDK 1.10
+sourceCompatibility = 1.10
 
 // Use Maven Central to resolve all 3rd party dependencies
 repositories {
@@ -36,10 +38,10 @@ repositories {
 }
 
 // Using the dependency management plugin, import the dependencies for
-// Spring Cloud release train 'Edgware.SR2'
+// Spring Cloud release train 'Finchley.SR1'
 dependencyManagement {
     imports {
-        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Edgware.SR2'
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.SR1'
     }
 }
 
@@ -51,16 +53,16 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
 
     // Service registration via Eureka
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-eureka-server'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server'
 
     // Feign declarative REST client
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-feign'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
 
     // Enable distributed tracing with Sleuth
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-zipkin'
 
     // Enable JSON logging
-    runtime( group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.11' ) {
+    runtime(group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.11') {
         exclude group: 'ch.qos.logback', module: 'logback-core'
     }
 
@@ -112,9 +114,8 @@ jar {
 }
 
 
-// Configure the spring boot executable jar
+// Configure the spring boot jar
 springBoot {
-    executable = true
     buildInfo()
 }
 
@@ -139,6 +140,6 @@ task buildDocker( type: Docker, dependsOn: build ) {
 
 // Configure the Gradle wrapper
 task wrapper( type: Wrapper ) {
-    gradleVersion = '4.5.1'
+    gradleVersion = '4.9'
 }
 
