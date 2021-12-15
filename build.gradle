@@ -47,26 +47,26 @@ dependencyManagement {
 
 dependencies {
     // Enable Spring MVC
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
 
     // Production metrics for Spring Boot
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
 
     // Service registration via Eureka
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-eureka-server'
 
     // Feign declarative REST client
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
 
     // Enable distributed tracing with Sleuth
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-zipkin'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-zipkin'
 
     // Enable JSON logging
-    runtime(group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.11') {
+    runtimeOnly(group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.11') {
         exclude group: 'ch.qos.logback', module: 'logback-core'
     }
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 
@@ -139,7 +139,7 @@ task buildDocker( type: Docker, dependsOn: build ) {
 
 
 // Configure the Gradle wrapper
-task wrapper( type: Wrapper ) {
-    gradleVersion = '4.9'
+wrapper {
+    gradleVersion = '6.9'
 }
 
