@@ -62,7 +62,7 @@ dependencies {
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-zipkin'
 
     // Enable JSON logging
-    runtimeOnly(group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '4.11') {
+    runtimeOnly(group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '5.0') {
         exclude group: 'ch.qos.logback', module: 'logback-core'
     }
 
